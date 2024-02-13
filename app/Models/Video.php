@@ -13,6 +13,6 @@ class Video extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'caption', 'url'
+        'caption', 'video'
     ];
 }

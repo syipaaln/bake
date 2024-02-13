@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
 {
@@ -12,8 +13,8 @@ class VideoController extends Controller
      */
     public function index()
     {
-        $video = Video::latest()->paginate(5);
-        return view('video.index', compact('video'))->with('i', (request()->input('page', 1) -1) *5);
+        $videos = Video::latest()->paginate(5);
+        return view('video.index', compact('videos'))->with('i', (request()->input('page', 1) -1) *5);
     }
 
     /**
@@ -24,36 +25,29 @@ class VideoController extends Controller
         return view('video.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'caption' => 'required',
-        //     'url' => 'required'
-        // ]);
-        // Video::create($request->all());
-
+        $user = auth()->user();
         $id = $request->get('id');
         if($id){
-            $video = Video::find($id);
+            $videos = Video::find($id);
         } else {
-            $video = new Video;
+            $videos = new Video;
         }
-        if($request->hasFile('url')){
-            $url = $request->file('url');
+        if($request->hasFile('video')){
+            $video = $request->file('video');
             $request->validate([
-                'url' => 'required|file|mimes:mp4,jpeg,png,jpg,gif|max:10048',
+                'video' => 'required|file|mimes:mp4,jpeg,png,jpg,gif|max:10048',
             ]);
-            $videoName = time() . '.' . $url->getClientOriginalExtension();
+            $videoName = time() . '.' . $video->getClientOriginalExtension();
             $destinationPath = 'video/';
-            $url->move($destinationPath, $videoName);
-            $video->url = $videoName;
+            $video->move($destinationPath, $videoName);
+            $videos->video = $videoName;
         }
-        $video->user_id = $request->user_id;
-        $video->caption = $request->caption;
-        $video->save();
+        $videos->created_by = $user->id;
+        $videos->caption = $request->caption;
+        $videos->save();
         return redirect()->route('vidio.index')->with('success', 'Video berhasil di unggah!');
     }
 
@@ -61,13 +55,21 @@ class VideoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Video $video)
+    public function destroy(Video $videos)
     {
-        $video->delete();
-        // Hapus foto lama (jika ada)
-        if ($video->url) {
-            unlink(public_path('video/' . $video->url));
+        // $videos->delete();
+        // // Hapus foto lama (jika ada)
+        // if ($videos->video) {
+        //     unlink(public_path('video/' . $videos->video));
+        // }
+        // return redirect()->route('vidio.index')->with('success', 'Video berhasil di hapus!');
+
+        if ($videos->video) {
+            Storage::delete('video/' . $videos->video);
         }
-        return redirect()->route('vidio.index')->with('success', 'Video berhasil di hapus!');
+        if ($videos->delete()) {
+            return redirect()->route('vidio.index')->with('success', 'Video berhasil di hapus!');
+        }
+        return redirect()->route('vidio.index')->with('error', 'Video gagal di hapus!');
     }
 }
