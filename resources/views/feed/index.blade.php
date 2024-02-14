@@ -83,7 +83,7 @@
                 <p>{{ $message }}</p>
             </div>
         @endif
-        @foreach ($videos as $video)
+        @foreach ($feed as $feed)
             <div class="position-relative d-inline-block">
                 {{-- <video width="640" height="360" controls class="card-img-top">
                     <source src="{{ asset('/videos/'.$video->video)}}" type="video/mp4">
@@ -96,15 +96,15 @@
                 @endif
                 <img src="{{ asset('storage/' . $product->picture) }}" class="img-thumbnail" alt=""> --}}
                 <video width="640" height="360" controls class="card-img-top">
-                    <source src="{{ asset('storage/'.$video->video)}}" type="video/mp4">
+                    <source src="{{ asset('storage/'.$feed->video)}}" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
             </div>
             <div class="text-left">
-                <div>{{ $video->caption }}</div>
-                <div>{{ $video->created_at->format('d F Y') }}</div>
+                <div>{{ $feed->caption }}</div>
+                <div>{{ $feed->created_at->format('d F Y') }}</div>
             </div>
-            <form action="{{ route('vidio.destroy',$video->id) }}" method="POST">
+            <form action="{{ route('feed.destroy',$feed->id) }}" method="POST">
     
                 @csrf
                 @method('DELETE')
@@ -122,7 +122,7 @@
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
             @csrf
         </form>
-        <a class="btn btn-success" href="{{ route('vidio.create') }}">Add</a>
+        <a class="btn btn-success" href="{{ route('feed.create') }}">Add</a>
     </div>
 </body>
 </html>

@@ -28,27 +28,49 @@ class VideoController extends Controller
 
     public function store(Request $request)
     {
+        // $user = auth()->user();
+        // $id = $request->get('id');
+        // if($id){
+        //     $videos = Video::find($id);
+        // } else {
+        //     $videos = new Video;
+        // }
+        // if($request->hasFile('video')){
+        //     $video = $request->file('video');
+        //     $request->validate([
+        //         'video' => 'required|file|mimes:mp4,jpeg,png,jpg,gif|max:10048',
+        //     ]);
+        //     $videoName = time() . '.' . $video->getClientOriginalExtension();
+        //     $destinationPath = 'video/';
+        //     $video->move($destinationPath, $videoName);
+        //     $videos->video = $videoName;
+        // }
+        // $videos->created_by = $user->id;
+        // $videos->caption = $request->caption;
+        // $videos->save();
+        // return redirect()->route('vidio.index')->with('success', 'Video berhasil di unggah!');
+
+        $request->validate([
+            // 'video' => 'required|file|mimes:mp4',
+            'video' => ['required', 'mimes:mp4', 'max:10048']
+        ]);
+
         $user = auth()->user();
-        $id = $request->get('id');
-        if($id){
-            $videos = Video::find($id);
-        } else {
-            $videos = new Video;
-        }
-        if($request->hasFile('video')){
-            $video = $request->file('video');
-            $request->validate([
-                'video' => 'required|file|mimes:mp4,jpeg,png,jpg,gif|max:10048',
-            ]);
-            $videoName = time() . '.' . $video->getClientOriginalExtension();
-            $destinationPath = 'video/';
-            $video->move($destinationPath, $videoName);
-            $videos->video = $videoName;
-        }
+        $videos = new Video();
         $videos->created_by = $user->id;
+        $videos->video =$request->file('video')->store('videos');
         $videos->caption = $request->caption;
+
+        // if ($request->hasFile('video')) {
+        //     $path = $request->file('video')->store('uploads');
+        //     $videos->video = $path;
+        // }
+
         $videos->save();
-        return redirect()->route('vidio.index')->with('success', 'Video berhasil di unggah!');
+
+        // if ($videos) {
+            return redirect(route('vidio.index'))->with('success','Added!');
+        // }
     }
 
 
@@ -57,19 +79,20 @@ class VideoController extends Controller
      */
     public function destroy(Video $videos)
     {
-        // $videos->delete();
+        // ($videos->delete());
+       // $videos->query("DELETE FROM videos WHERE id = '$videos'") or die ($videos->error);
         // // Hapus foto lama (jika ada)
-        // if ($videos->video) {
-        //     unlink(public_path('video/' . $videos->video));
+        //  if ($videos->destroy) { 
+        //    unlink(public_path('videos/' . $videos->video));
         // }
-        // return redirect()->route('vidio.index')->with('success', 'Video berhasil di hapus!');
+        //return redirect()->route('vidio.index')->with('success', 'Video berhasil di hapus!');
 
-        if ($videos->video) {
-            Storage::delete('video/' . $videos->video);
-        }
+          if($videos->video) {
+           Storage::delete($videos->video);
+         }
         if ($videos->delete()) {
             return redirect()->route('vidio.index')->with('success', 'Video berhasil di hapus!');
-        }
+         }
         return redirect()->route('vidio.index')->with('error', 'Video gagal di hapus!');
     }
 }
