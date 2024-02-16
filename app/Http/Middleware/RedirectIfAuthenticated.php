@@ -17,12 +17,29 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        $guards = empty($guards) ? [null] : $guards;
+        // $guards = empty($guards) ? [null] : $guards;
 
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
-            }
+        // foreach ($guards as $guard) {
+        //     if (Auth::guard($guard)->check()) {
+        //         return redirect('/feed');
+        //     }
+        // }
+        // return $next($request);
+
+        // if (Auth::check()) {
+        //     return $next($request);
+        // }
+
+        // return redirect('/login'); // Sesuaikan dengan path halaman login Anda
+
+        // Jika pengguna sudah login, redirect dari rute login
+        if (Auth::check() && $request->routeIs('login')) {
+            return redirect('/feed'); // Sesuaikan dengan path halaman setelah login
+        }
+
+        // Jika pengguna belum login, redirect dari rute logout
+        if (!Auth::check() && $request->routeIs('logout')) {
+            return redirect('/login'); // Sesuaikan dengan path halaman login
         }
 
         return $next($request);

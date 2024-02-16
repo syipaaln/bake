@@ -26,12 +26,12 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/vidio';
+    protected $redirectTo = '/feed';
 
     protected function authenticated(Request $request, $user)
     {
         // Set notifikasi flash ke session
-        session()->flash('success', 'Login berhasil.');
+        session()->flash('success', 'Login berhasil!');
 
         // Redirect ke lokasi yang ditentukan setelah login
         return redirect()->intended($this->redirectPath());

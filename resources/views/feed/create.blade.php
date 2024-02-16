@@ -68,6 +68,16 @@
 <body>
     <div class="container">
         <h2 class="text-center" style="margin-top: 40px;">New Feed</h2>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> Input gagal.<br><br>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <form action="{{ route('feed.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             {{-- <div class="form-group">
